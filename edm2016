@@ -1,0 +1,5 @@
+source /Users/benastenhaug/Desktop/edm2016/.tox/py27/bin/activate
+
+rnn_prof irt assistments skill_builder_data_corrected_small.txt --onepo \
+--drop-duplicates --no-remove-skill-nans --num-folds 5 \
+--item-id-col problem_id --concept-id-col single

@@ -148,26 +148,30 @@ def irt(common, source, data_file, twopo, concept_id_col, template_precision,
     SOURCE specifies the student data source, and should be 'assistments' or 'kddcup'.
     DATA_FILE is the filename for the interactions data.
     """
+    
+    print(2)
+    
+    print(common.max_inter)
 
-    if (template_precision is None) != (template_id_col is None):
-        raise ValueError("template_precision and template_id_col must both be set or both be None")
-    data_opts = DataOpts(num_folds=common.num_folds, item_id_col=common.item_id_col,
-                         concept_id_col=concept_id_col, template_id_col=template_id_col,
-                         remove_skill_nans=common.remove_skill_nans,
-                         seed=common.seed, use_correct=True,
-                         use_hints=False, drop_duplicates=common.drop_duplicates,
-                         max_interactions_per_user=common.max_inter,
-                         min_interactions_per_user=common.min_inter,
-                         proportion_students_retained=common.proportion_students_retained)
-
-    data, _, _, _, _ = load_data(data_file, source, data_opts)
-    data_folds = split_data(data, num_folds=common.num_folds, seed=common.seed)
-    run_irt.irt(data_folds, common.num_folds, output=common.output, data_opts=data_opts,
-                is_two_po=twopo,
-                template_precision=template_precision,
-                single_concept=concept_id_col is None,
-                which_fold=common.which_fold,
-                item_precision=item_precision)
+    # if (template_precision is None) != (template_id_col is None):
+    #     raise ValueError("template_precision and template_id_col must both be set or both be None")
+    # data_opts = DataOpts(num_folds=common.num_folds, item_id_col=common.item_id_col,
+    #                      concept_id_col=concept_id_col, template_id_col=template_id_col,
+    #                      remove_skill_nans=common.remove_skill_nans,
+    #                      seed=common.seed, use_correct=True,
+    #                      use_hints=False, drop_duplicates=common.drop_duplicates,
+    #                      max_interactions_per_user=common.max_inter,
+    #                      min_interactions_per_user=common.min_inter,
+    #                      proportion_students_retained=common.proportion_students_retained)
+    # 
+    # data, _, _, _, _ = load_data(data_file, source, data_opts)
+    # data_folds = split_data(data, num_folds=common.num_folds, seed=common.seed)
+    # run_irt.irt(data_folds, common.num_folds, output=common.output, data_opts=data_opts,
+    #             is_two_po=twopo,
+    #             template_precision=template_precision,
+    #             single_concept=concept_id_col is None,
+    #             which_fold=common.which_fold,
+    #             item_precision=item_precision)
 
 
 @cli.command('naive')

@@ -9,7 +9,7 @@ from scipy import sparse as sp
 
 from .data.constants import (ITEM_IDX_KEY, TEMPLATE_IDX_KEY, USER_IDX_KEY, CORRECT_KEY,
                              CONCEPT_IDX_KEY)
-from .data.wrapper import DEFAULT_DATA_OPTS
+from data.wrapper import DEFAULT_DATA_OPTS
 from .irt import TEST_RESPONSES_KEY, OFFSET_COEFFS_KEY
 from .irt.callbacks import ConvergenceCallback
 from .irt.learners import OnePOLearner, TwoPOLearner, OnePOHighRT, HIGHER_OFFSET_KEY
