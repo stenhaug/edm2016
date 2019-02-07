@@ -7,17 +7,16 @@ import numpy as np
 import pandas as pd
 from scipy import sparse as sp
 
-from .data.constants import (ITEM_IDX_KEY, TEMPLATE_IDX_KEY, USER_IDX_KEY, CORRECT_KEY,
+from data.constants import (ITEM_IDX_KEY, TEMPLATE_IDX_KEY, USER_IDX_KEY, CORRECT_KEY,
                              CONCEPT_IDX_KEY)
 from data.wrapper import DEFAULT_DATA_OPTS
-from .irt import TEST_RESPONSES_KEY, OFFSET_COEFFS_KEY
-from .irt.callbacks import ConvergenceCallback
-from .irt.learners import OnePOLearner, TwoPOLearner, OnePOHighRT, HIGHER_OFFSET_KEY
-from .irt.metrics import Metrics
-from .irt.online_cross_validation import get_online_rps
+from irt import TEST_RESPONSES_KEY, OFFSET_COEFFS_KEY
+from irt.callbacks import ConvergenceCallback
+from irt.learners import OnePOLearner, TwoPOLearner, OnePOHighRT, HIGHER_OFFSET_KEY
+from irt.metrics import Metrics
+from irt.online_cross_validation import get_online_rps
 
 LOGGER = logging.getLogger(__name__)
-
 
 def get_metrics(correct, rps):
     """ Compute global PC, MAP Accuracy, AUC validation metrics.
@@ -105,9 +104,9 @@ def get_irt_learner(train_df, test_df=None, is_two_po=True,
         if item_precision is not None:
             learner.nodes[OFFSET_COEFFS_KEY].cpd.precision = \
                 item_precision * sp.eye(learner.nodes[OFFSET_COEFFS_KEY].data.size)
-            LOGGER.info("Made a 1PO IRT learner with item precision %f", item_precision)
+            print("Made a 1PO IRT learner with item precision %f", item_precision)
         else:
-            LOGGER.info("Made a 1PO IRT learner with default item precision")
+            print("Made a 1PO IRT learner with default item precision")
     else:
         template_idx = train_df[TEMPLATE_IDX_KEY]
         if test_df is not None:
@@ -124,7 +123,7 @@ def get_irt_learner(train_df, test_df=None, is_two_po=True,
                 template_precision * sp.eye(learner.nodes[HIGHER_OFFSET_KEY].data.size)
         for node in learner.nodes.itervalues():
             node.solver_pars.updater.step_size = 0.5
-        LOGGER.info("Made a hierarchical IRT learner with item precision %f and template "
+        print("Made a hierarchical IRT learner with item precision %f and template "
                     "precision %f", item_precision, template_precision)
     return learner
 
@@ -167,10 +166,11 @@ def irt(data_folds, num_folds, output=None, data_opts=DEFAULT_DATA_OPTS, is_two_
         metrics = metrics.append(pd.DataFrame(index=[len(metrics)], data=fold_metrics))
 
     if output:
+        metrics.to_csv("/Users/benastenhaug/Desktop/metrics.csv")
         metrics.to_pickle(output)
 
     # Print overall results
-    LOGGER.info("Overall Acc: %.5f AUC: %.5f", metrics['map'].mean(), metrics['auc'].mean())
+    print("Overall Acc: %.5f AUC: %.5f", metrics['map'].mean(), metrics['auc'].mean())
 
 
 def eval_learner(train_data, test_data, is_two_po, fold_num,
@@ -191,14 +191,14 @@ def eval_learner(train_data, test_data, is_two_po, fold_num,
     :return: the validation metrics, predicted RP's, and boolean corrects on the test set
     :rtype: dict, np.ndarray[float], np.ndarray[bool]
     """
-    LOGGER.info("Training %s model, fold %d, (single concept = %s)",
+    print("Training %s model, fold %d, (single concept = %s)",
                 '2PO' if is_two_po else '1PO', fold_num, single_concept)
     learner = get_irt_learner(train_data, test_data, is_two_po=is_two_po,
                               single_concept=single_concept,
                               template_precision=template_precision,
                               item_precision=item_precision)
     learner.learn()
-    LOGGER.info("Performing online cross-validation")
+    print("Performing online cross-validation")
     prob_correct = get_online_rps(learner, test_data[USER_IDX_KEY].values,
                                   compute_first_interaction_rps=True)
 
@@ -207,6 +207,6 @@ def eval_learner(train_data, test_data, is_two_po, fold_num,
     metrics['is_two_po'] = is_two_po
     metrics['fold_num'] = fold_num
     metrics['num_test_interactions'] = len(test_correct)
-    LOGGER.info("Fold %d: Num Interactions: %d; Test Accuracy: %.5f; Test AUC: %.5f",
+    print("Fold %d: Num Interactions: %d; Test Accuracy: %.5f; Test AUC: %.5f",
                 fold_num, metrics['num_test_interactions'], metrics['map'], metrics['auc'])
     return metrics, prob_correct, test_correct

@@ -39,11 +39,20 @@ def split_data(data, num_folds, seed=0):
     :return: a generator over (train dataframe, test dataframe) tuples
     :rtype: generator[(pd.DataFrame, pd.DataFrame)]
     """
+
+    print("hi")
+
     # break up students into folds
     fold_student_idx = _get_fold_student_idx(np.unique(data[USER_IDX_KEY]), num_folds=num_folds,
                                              seed=seed)
 
+    i = 1
     for fold_test_student_idx in fold_student_idx:
         test_idx = np.in1d(data[USER_IDX_KEY], fold_test_student_idx)
         train_idx = np.logical_not(test_idx)
+
+        data[train_idx].to_csv("/Users/benastenhaug/Desktop/" + str(i) + "train.csv")
+        data[test_idx].to_csv("/Users/benastenhaug/Desktop/" + str(i) + "test.csv")
+        i = i + 1
+
         yield (data[train_idx].copy(), data[test_idx].copy())
